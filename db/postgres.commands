@@ -1,0 +1,58 @@
+psql -c "\du"   # show all postgres users, use from terminal/command-line
+
+# using utility "createuser -- define a new PostgreSQL user account"
+# Sources:
+#   - https://www.codementor.io/engineerapart/getting-started-with-postgresql-on-mac-osx-are8jcopb
+#   - https://www.postgresql.org/docs/9.5/static/app-createuser.html
+createuser sinbad --superuser --createdb --login --pwprompt
+dropuser sinbad
+
+createdb --owner=sinbad sinbad                  # for new db
+createdb -O sinbad -T sinbad sinbad-o1       # for copy db
+pg_dump sinbad > sinbad.sql                   # SQL Dump
+psql -U sinbad -d sinbad -1 -f sinbad.sql    # Restore through SQL,
+                                                # -1/--single-transaction - Issue a BEGIN command before the first
+                                                # such option and a COMMIT command after the last one.
+
+
+
+
+
+
+# For Linux
+    sudo su - postgres
+    psql
+
+# For Mac OS
+    psql postgres [sudo psql postgres]
+
+CREATE ROLE new_role_name;
+CREATE ROLE role_name WITH password 'password_123';
+CREATE ROLE demo_role WITH LOGIN;
+CREATE ROLE demo_role WITH createdb;
+CREATE ROLE demo_role WITH Superuser;
+\du
+\q
+
+
+Drop Table Command:
+DROP TABLE table_name;
+
+Show Table Attribute Details:
+\d table_name
+
+
+ALTER TABLE pr_employee ADD COLUMN active STATUS;
+ALTER TABLE pr_employee ALTER COLUMN active SET DEFAULT 'ACTIVE';
+UPDATE pr_employee SET active = 'ACTIVE';
+
+alter table pr_employee_pf add column description TEXT;
+
+ALTER TABLE pr_employee DROP COLUMN action;
+DROP VIEW pr_employee_view;
+
+
+ALTER TYPE status_enum ADD VALUE 'blocked';
+ALTER TYPE PR_PAYMENT_RULE_CATEGORY ADD VALUE 'GRATUITY';
+ALTER TYPE PR_PAYMENT_RULE_CATEGORY ADD VALUE 'EARNLEAVE';
+ALTER TYPE PR_PAYMENT_RULE_CATEGORY ADD VALUE 'PROVIDENTFUND';
