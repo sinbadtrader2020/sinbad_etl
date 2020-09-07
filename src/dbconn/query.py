@@ -9,7 +9,7 @@ def _execute_select(sql, data=None):
     success = False
     try:
         with connection.get_db_cursor() as cursor:
-            print("[INFO: _execute_select]", cursor.mogrify(sql, data))
+            # print("[INFO: _execute_select]", cursor.mogrify(sql, data))
             if data:
                 cursor.execute(sql, data)
             else:
@@ -29,7 +29,7 @@ def _execute_iud(sql, data, commit=False):
     result = ''
     try:
         with connection.get_db_cursor(commit) as cursor:
-            print("[INFO: _execute_iud]", cursor.mogrify(sql, data))
+            # print("[INFO: _execute_iud]", cursor.mogrify(sql, data))
             cursor.execute(sql, data)
             rows = cursor.fetchall()
             result = {DATA: rows}
