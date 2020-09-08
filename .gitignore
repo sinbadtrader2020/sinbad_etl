@@ -1,5 +1,6 @@
 # Project Files
 .idea/
+output
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

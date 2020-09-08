@@ -2,6 +2,7 @@ import csv
 import os
 from csvvalidator import *
 import sys
+from src.etl import common
 
 
 # def static_vars(**kwargs):
@@ -10,6 +11,8 @@ import sys
 #             setattr(func, k, kwargs[k])
 #         return func
 #     return decorate
+
+
 def set_static_validator():
     field_names = ('No.',
                    'Ticker',
@@ -24,11 +27,12 @@ def set_static_validator():
                    'Volume')
     validator = CSVValidator(field_names)
     validator.add_header_check('EX1', 'bad header')
+
     def decorate(func):
         setattr(func, 'validator', validator)
         return func
-    return decorate
 
+    return decorate
 
 
 @set_static_validator()
@@ -41,9 +45,9 @@ def validate_csv_header(data):
     return True
 
 
-def load_nc_lookup_companies_from_file(file_name = None):
+def load_nc_lookup_companies_from_file(file_name=None):
     if not file_name:
-        pass    # TODO add business logic
+        pass  # TODO add business logic
 
     dict_list = []
     with open(file_name) as csvfile:
@@ -59,13 +63,12 @@ def load_nc_lookup_companies_from_file(file_name = None):
     return dict_list
 
 
-def load_nc_lookup_companies_from_directory(directory_name = None):
+def load_nc_lookup_companies_from_directory(directory_name=None):
     dict_list = []
     with os.scandir(directory_name) as entries:
         for entry in entries:
-            tmp = load_nc_lookup_companies_from_file(directory_name+entry.name)
+            tmp = load_nc_lookup_companies_from_file(directory_name + entry.name)
             dict_list.extend(tmp)
-
 
     import pprint
     pprint.pprint(dict_list)
@@ -77,15 +80,19 @@ class FilterLookupCategory:
     """
     FilterLookupCategory
     """
+
     def __init__(self, folder_name=None):
         self.lookup = load_nc_lookup_companies_from_directory(folder_name)
 
     def __call__(self, company=None):
+        """
+
+        :param company: Company object
+        :return: (bool, str)
+        """
 
         for nc_company in self.lookup:
             if company.sf_act_symbol == nc_company['Ticker']:
-                company.sf_aaoifi_compliant = False
+                return False, common.get_nc_reason_string(common.NonCompliantReasonCode.NCL)
 
-                return False
-
-        return True
+        return True, common.CMP_CODE
