@@ -15,3 +15,8 @@ def get_nc_reason_string(reason_code, reason_string=''):
     if reason_string:
         return reason_code + " -> " + reason_string
     return reason_code
+
+def get_string_to_float(str):
+    if str == 'None':
+        return 0
+    return float(str)

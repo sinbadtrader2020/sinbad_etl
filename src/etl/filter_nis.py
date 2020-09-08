@@ -29,7 +29,6 @@ class FilterNIS:
                        common.get_nc_reason_string(common.NonCompliantReasonCode.NIS,
                                                    "No Data ({0})".format(url))
 
-            # quarterly_reports = data["quarterlyReports"]
             quarterly_reports = data.get("quarterlyReports", None)
             if quarterly_reports is None:
                 quarterly_reports = data["annualReports"]
@@ -48,25 +47,16 @@ class FilterNIS:
                        common.get_nc_reason_string(common.NonCompliantReasonCode.NIS,
                                                    "Empty Annual or Querterly Reports ({0})".format(url))
 
-            interest_income_str = quarterly_report_latest["interestIncome"]
-            if interest_income_str == 'None':
-                interest_income_str = None
+            interest_income = common.get_string_to_float(quarterly_report_latest["interestIncome"])
+            net_income = common.get_string_to_float(quarterly_report_latest["netIncome"])
 
-            net_income_str = quarterly_report_latest["netIncome"]
-            if net_income_str == 'None':
-                return False, \
-                       common.get_nc_reason_string(common.NonCompliantReasonCode.NIS,
-                                                   "No 'netIncome' ({0})".format(url))
-
-            interest_income = float(interest_income_str or 0)
-            net_income = float(net_income_str)
             if net_income <= 0:
                 return False, \
                        common.get_nc_reason_string(common.NonCompliantReasonCode.NIS,
                                                    "Zero or Negetive 'netIncome' ({0})".format(url))
 
+            # Business Logic: Non-compliant Income Source (NIS)
             ratio = interest_income / net_income
-
             if ratio < 0.05:
                 return False, \
                        common.get_nc_reason_string(common.NonCompliantReasonCode.NIS,

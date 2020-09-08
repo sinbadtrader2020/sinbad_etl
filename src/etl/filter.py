@@ -18,14 +18,12 @@ class TradingProcessor:
         filters = [
             FilterLookupCategory('/Users/pothik/Repo/miscellaneous/sinbad_finance/sinbad_finance_etl/file/lookup/'),
             FilterNIS(url_string=url, function='INCOME_STATEMENT', apikey=apikey),
-            # FilterIATR(url_string=url, function='BALANCE_SHEET', apikey=apikey),
+            FilterIATR(url_string=url, function='BALANCE_SHEET', apikey=apikey),
             # FilterDR(url_string=url, function='OVERVIEW', apikey=apikey),
             # FilterNIR(url_string=url, function='BALANCE_SHEET', apikey=apikey),
         ]
 
         for row in companies:
-            # data = row.split(',')
-            # print(csv.reader(row, delimiter=','))
             company = Company(*row)
 
             for filter in filters:
@@ -37,7 +35,7 @@ class TradingProcessor:
                     break
 
                     # TODO commented for testing purpose
-                    # result, success = create_or_update_record(table_name=DBClassName.COMPANY,
-                    #                                           conflict_field='sf_act_symbol',
-                    #                                           return_field='sf_company_id',
-                    #                                           record=company)
+                    result, success = create_or_update_record(table_name=DBClassName.COMPANY,
+                                                              conflict_field='sf_act_symbol',
+                                                              return_field='sf_company_id',
+                                                              record=company)
