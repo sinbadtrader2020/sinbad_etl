@@ -1,6 +1,8 @@
 from datetime import datetime
 import requests
 
+from src.etl import common
+
 
 class FilterDR:
     """
@@ -11,53 +13,40 @@ class FilterDR:
         if url_string is None \
                 or function is None \
                 or apikey is None:
-            raise Exception("FilterIATR")  # TODO give proper message
+            raise Exception("FilterDR")  # TODO give proper message
 
-        self.formatted_url = url_string + '?function=' + function + '&symbol={0}' + '&apikey=' + apikey
-        self.temp_count = 0
+        self.formatted_url = common.get_formatted_aaoifi_url(url_string, function, apikey)
 
     def __call__(self, company=None):
         url = self.formatted_url.format(company.sf_act_symbol)
-        # url = self.formatted_url.format('IBM')
 
         try:
             result = requests.get(url)
 
-            # TODO temporary test
-            self.temp_count += 1
-            if self.temp_count > 5:
-                print("Dummy")
-                return True
-
             data = result.json()
-            quarterly_reports = data["quarterlyReports"]
+            if not data:
+                return False, \
+                       common.get_nc_reason_string(common.NonCompliantReasonCode.DR,
+                                                   "No Data ({0})".format(url))
 
-            quarterly_report_latest = None
-            date_latest = datetime.strptime("1970-01-01", '%Y-%m-%d')
-            for quarterly_report in quarterly_reports:
-                date = datetime.strptime(quarterly_report["fiscalDateEnding"], '%Y-%m-%d')
-                if date > date_latest:
-                    quarterly_report_latest = quarterly_report
-                    date_latest = date
+            total_longterm_debt = common.get_string_to_float(company._iatr_totalLongTermDebt)
+            market_capitalization = common.get_string_to_float(data["MarketCapitalization"])
 
-                if quarterly_report_latest is None:
-                    raise Exception('FilterNIS')
+            if market_capitalization <= 0:
+                return False, \
+                       common.get_nc_reason_string(common.NonCompliantReasonCode.DR,
+                                                   "Zero or Negetive 'totalLongTermDebt' ({0})".format(url))
 
-                interest_income_str = quarterly_report_latest["interestIncome"]
-                if interest_income_str == 'None':
-                    interest_income_str = None
-
-                interest_income = float(interest_income_str or 0)
-                net_income = float(quarterly_report_latest["netIncome"])
-                ratio = interest_income / net_income
-
-                if ratio < 0.05:
-                    print('[INFO] NIS: Non-compliant income source (NIS) --> ' + url, date)
-                    return False
+            # Business Logic: DR: interest bearing debt to total asset ratio
+            ratio = total_longterm_debt / market_capitalization
+            if ratio >= 0.3:
+                return False, \
+                       common.get_nc_reason_string(common.NonCompliantReasonCode.DR,
+                                                   "According to Business Logic ({0})".format(url))
 
         except KeyError as key_error:
-            print(result.status_code, data)
-            print(self.__class__.__name__, company.sf_act_symbol, key_error, url)
-            # TODO handle exception
+            return False, \
+                   common.get_nc_reason_string(common.NonCompliantReasonCode.DR,
+                                               "Not found parameter {0} ({1})".format(key_error, url))
 
-        return True
+        return True, common.CMP_CODE

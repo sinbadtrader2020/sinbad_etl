@@ -16,10 +16,10 @@ class TradingProcessor:
         url = 'https://www.alphavantage.co/query'
         apikey = 'AOYGBU6J7IN09PCE'  # 'JFG78N1VW11CJSOW'
         filters = [
-            FilterLookupCategory('/Users/pothik/Repo/miscellaneous/sinbad_finance/sinbad_finance_etl/file/lookup/'),
-            FilterNIS(url_string=url, function='INCOME_STATEMENT', apikey=apikey),
+            # FilterLookupCategory('/Users/pothik/Repo/miscellaneous/sinbad_finance/sinbad_finance_etl/file/lookup/'),
+            # FilterNIS(url_string=url, function='INCOME_STATEMENT', apikey=apikey),
             FilterIATR(url_string=url, function='BALANCE_SHEET', apikey=apikey),
-            # FilterDR(url_string=url, function='OVERVIEW', apikey=apikey),
+            FilterDR(url_string=url, function='OVERVIEW', apikey=apikey),
             # FilterNIR(url_string=url, function='BALANCE_SHEET', apikey=apikey),
         ]
 
@@ -34,8 +34,8 @@ class TradingProcessor:
                     print('[INFO] ' + nc_reason)
                     break
 
-                    # TODO commented for testing purpose
-                    result, success = create_or_update_record(table_name=DBClassName.COMPANY,
-                                                              conflict_field='sf_act_symbol',
-                                                              return_field='sf_company_id',
-                                                              record=company)
+            # TODO commented for testing purpose
+            result, success = create_or_update_record(table_name=DBClassName.COMPANY,
+                                                      conflict_field='sf_act_symbol',
+                                                      return_field='sf_company_id',
+                                                      record=company)

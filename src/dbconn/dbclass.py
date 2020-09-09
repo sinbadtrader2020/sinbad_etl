@@ -13,7 +13,7 @@ class DBAbstract:
         values = list()
         str_format = ''
         for attr, value in self.__dict__.items():
-            if value is not None or not attr.startswith('_'):
+            if value is not None and not attr.startswith('_'):
                 if str_keys:
                     str_keys += ', '
                     str_format += ', '
