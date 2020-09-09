@@ -1,4 +1,3 @@
-from datetime import datetime
 import requests
 
 from src.etl import common
@@ -7,6 +6,7 @@ from src.etl import common
 class FilterDR:
     """
     DR: interest bearing debt to total asset ratio
+    Depends on FilterIATR
     """
 
     def __init__(self, url_string=None, function="", apikey=""):
@@ -32,10 +32,12 @@ class FilterDR:
             total_longterm_debt = common.get_string_to_float(company._iatr_totalLongTermDebt)
             market_capitalization = common.get_string_to_float(data["MarketCapitalization"])
 
+            company._iatr_MarketCapitalization = market_capitalization  # will be used in FilterNIR
+
             if market_capitalization <= 0:
                 return False, \
                        common.get_nc_reason_string(common.NonCompliantReasonCode.DR,
-                                                   "Zero or Negetive 'totalLongTermDebt' ({0})".format(url))
+                                                   "Zero or Negetive 'MarketCapitalization' ({0})".format(url))
 
             # Business Logic: DR: interest bearing debt to total asset ratio
             ratio = total_longterm_debt / market_capitalization

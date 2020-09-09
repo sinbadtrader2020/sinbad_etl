@@ -5,7 +5,7 @@ ERROR = 'error'
 MESSAGE = 'message'
 
 
-def _execute_select(sql, data=None):
+def _execute_select_all(sql, data=None):
     success = False
     try:
         with connection.get_db_cursor() as cursor:
@@ -22,6 +22,25 @@ def _execute_select(sql, data=None):
         result = {ERROR: str(e)}
 
     return result, success
+
+
+def _iter_row(cursor, size=10):
+    while True:
+        rows = cursor.fetchmany(size)
+        if not rows:
+            break
+        for row in rows:
+            yield row
+
+
+def _execute_select_many(sql, data=None, limit=10):
+    with connection.get_db_cursor() as cursor:
+        if data:
+            cursor.execute(sql, data)
+        else:
+            cursor.execute(sql)
+
+        yield from _iter_row(cursor, limit)
 
 
 def _execute_iud(sql, data, commit=False):
@@ -67,7 +86,7 @@ def _execute_iud(sql, data, commit=False):
 #     return result, success
 
 
-def get_record(table_name=None, group=False, offset=0, limit='ALL', field_name=None, qparam=False):
+def get_records(table_name=None, group=False, offset=0, limit='ALL', field_name=None, qparam=False):
     data = None
     if group:
         sql = """SELECT * from {0} LIMIT {1} OFFSET {2}""".format(table_name, limit, offset)
@@ -83,13 +102,34 @@ def get_record(table_name=None, group=False, offset=0, limit='ALL', field_name=N
         data = (offset,)
 
     print(sql)
-    return _execute_select(sql, data)
+    return _execute_select_all(sql, data)
+
+
+def get_records_partly(table_name=None, group=False, offset=0, limit=10, field_name=None, qparam=False):
+    data = None
+    if group:
+        sql = """SELECT * from {0} OFFSET {1}""".format(table_name, offset)
+    elif qparam:
+        tmp = """SELECT * from {0} WHERE {1} = %s"""
+        for i in range(1, len(field_name)):
+            tmp += """ and {""" + str(i+1) + """} = %s"""
+
+        sql = tmp.format(table_name, *field_name)
+        data = offset
+    elif field_name:
+        sql = """SELECT * from {0} WHERE {1} = %s""".format(table_name, field_name)
+        data = (offset,)
+    else:
+        sql = """SELECT * from {0}""".format(table_name)
+
+    print(sql)
+    return _execute_select_many(sql, data, limit)
 
 
 def get_count(table_name=None):
     sql = """SELECT COUNT(*) FROM {0}""".format(table_name)
 
-    return _execute_select(sql)
+    return _execute_select_all(sql)
 
 
 def create_record(table_name=None, record=None, field_name=None, production=True):
@@ -131,4 +171,3 @@ def create_or_update_record(table_name=None, record=None, conflict_field=None, r
     values = values + values
 
     return _execute_iud(sql, values, commit=production)
-

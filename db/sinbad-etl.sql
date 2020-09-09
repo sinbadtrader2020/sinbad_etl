@@ -18,6 +18,7 @@ CREATE TABLE public.sf_companies (
   sf_test_issue         TEXT,
   sf_nasdaq_symbol      TEXT,
   sf_aaoifi_compliant   BOOLEAN NOT NULL DEFAULT FALSE,
+  sf_nc_reason          TEXT,
   sf_last_screened      TIMESTAMP DEFAULT NOW(),
   sf_created            TIMESTAMP DEFAULT NOW(),
   sf_updated            TIMESTAMP DEFAULT NOW()

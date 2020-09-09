@@ -37,6 +37,7 @@ class Company(DBAbstract):
                  sf_nasdaq_symbol=None,
                  sf_last_screened=None,
                  sf_aaoifi_compliant=True,
+                 sf_nc_reason=None,
                  **kwargs):
         self.sf_act_symbol = sf_act_symbol
         self.sf_company_name = sf_company_name
@@ -49,6 +50,7 @@ class Company(DBAbstract):
         self.sf_nasdaq_symbol = sf_nasdaq_symbol
         self.sf_last_screened = sf_last_screened
         self.sf_aaoifi_compliant = sf_aaoifi_compliant
+        self.sf_nc_reason = sf_nc_reason
 
         # private attributes not POJO
         self._sf_company_id = None

@@ -56,8 +56,8 @@ class FilterIATR:
             totalLongTermDebt = common.get_string_to_float(financial_report_latest["totalLongTermDebt"])
 
             company._iatr_totalLongTermDebt = totalLongTermDebt  # will be used in FilterDR
-            company._iatr_longTermInvestments = longTermInvestments  # will be used in FilterNIS
-            company._iatr_shortTermInvestments = shortTermInvestments  # will be used in FilterNIS
+            company._iatr_longTermInvestments = longTermInvestments  # will be used in FilterNIR
+            company._iatr_shortTermInvestments = shortTermInvestments  # will be used in FilterNIR
 
             if totalAssets <= 0:
                 return False, \
