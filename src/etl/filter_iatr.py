@@ -29,33 +29,35 @@ class FilterIATR:
                        common.get_nc_reason_string(common.NonCompliantReasonCode.IATR,
                                                    "No Data ({0})".format(url))
 
-            quarterly_reports = data.get("quarterlyReports", None)
-            if quarterly_reports is None:
-                quarterly_reports = data["annualReports"]
+            financial_reports = data.get("quarterlyReports", None)
+            if financial_reports is None:
+                financial_reports = data["annualReports"]
                 print("[CAUSE]", self.__class__.__name__, company.sf_act_symbol, url,
                       "No 'quarterlyReports', used 'annualReports'")
 
-            quarterly_report_latest = None
+            financial_report_latest = None
             date_latest = datetime.strptime("1970-01-01", '%Y-%m-%d')
-            for quarterly_report in quarterly_reports:
-                date = datetime.strptime(quarterly_report["fiscalDateEnding"], '%Y-%m-%d')
+            for financial_report in financial_reports:
+                date = datetime.strptime(financial_report["fiscalDateEnding"], '%Y-%m-%d')
                 if date > date_latest:
-                    quarterly_report_latest = quarterly_report
+                    financial_report_latest = financial_report
                     date_latest = date
 
-            if quarterly_report_latest is None:
+            if financial_report_latest is None:
                 return False, \
                        common.get_nc_reason_string(common.NonCompliantReasonCode.IATR,
                                                    "Empty Annual or Querterly Reports ({0})".format(url))
 
-            totalAssets = common.get_string_to_float(quarterly_report_latest["totalAssets"])
-            longTermInvestments = common.get_string_to_float(quarterly_report_latest["longTermInvestments"])
-            shortTermInvestments = common.get_string_to_float(quarterly_report_latest["shortTermInvestments"])
-            netReceivables = common.get_string_to_float(quarterly_report_latest["netReceivables"])
-            inventory = common.get_string_to_float(quarterly_report_latest["inventory"])
-            totalLongTermDebt = common.get_string_to_float(quarterly_report_latest["totalLongTermDebt"])
+            totalAssets = common.get_string_to_float(financial_report_latest["totalAssets"])
+            longTermInvestments = common.get_string_to_float(financial_report_latest["longTermInvestments"])
+            shortTermInvestments = common.get_string_to_float(financial_report_latest["shortTermInvestments"])
+            netReceivables = common.get_string_to_float(financial_report_latest["netReceivables"])
+            inventory = common.get_string_to_float(financial_report_latest["inventory"])
+            totalLongTermDebt = common.get_string_to_float(financial_report_latest["totalLongTermDebt"])
 
-            company._iatr_totalLongTermDebt = totalLongTermDebt # will be used in FilterDR
+            company._iatr_totalLongTermDebt = totalLongTermDebt  # will be used in FilterDR
+            company._iatr_longTermInvestments = longTermInvestments  # will be used in FilterNIS
+            company._iatr_shortTermInvestments = shortTermInvestments  # will be used in FilterNIS
 
             if totalAssets <= 0:
                 return False, \
