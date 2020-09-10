@@ -42,14 +42,15 @@ class TradingProcessor:
         for row in iter_row:
             company = Company(**row)
 
+            compliant, nc_reason = None, None
             for filter in self.filters:
                 compliant, nc_reason = filter(company)
-                company.sf_aaoifi_compliant = compliant
-                company.sf_nc_reason = nc_reason
-
                 if not compliant:
                     print('[INFO] ' + nc_reason)
                     break
+
+            company.sf_aaoifi_compliant = compliant
+            company.sf_nc_reason = nc_reason
 
             # TODO check result & success
             result, success = create_or_update_record(table_name=DBClassName.COMPANY,

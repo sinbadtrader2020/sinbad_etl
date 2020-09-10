@@ -36,7 +36,7 @@ class Company(DBAbstract):
                  sf_test_issue=None,
                  sf_nasdaq_symbol=None,
                  sf_last_screened=None,
-                 sf_aaoifi_compliant=True,
+                 sf_aaoifi_compliant=None,
                  sf_nc_reason=None,
                  **kwargs):
         self.sf_act_symbol = sf_act_symbol

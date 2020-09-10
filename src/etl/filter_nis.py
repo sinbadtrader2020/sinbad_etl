@@ -57,7 +57,7 @@ class FilterNIS:
 
             # Business Logic: Non-compliant Income Source (NIS)
             ratio = interest_income / net_income
-            if ratio < 0.05:
+            if ratio >= 0.05:
                 return False, \
                        common.get_nc_reason_string(common.NonCompliantReasonCode.NIS,
                                                    "According to Business Logic ({0})".format(url))
