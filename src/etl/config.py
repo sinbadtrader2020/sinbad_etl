@@ -1,0 +1,4 @@
+class FunctionConfig:
+    INCOME_STATEMENT    = 'INCOME_STATEMENT'
+    BALANCE_SHEET       ='BALANCE_SHEET'
+    OVERVIEW            ='OVERVIEW'

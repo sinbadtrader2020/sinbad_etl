@@ -1,28 +1,4 @@
-class DBClassName:
-    COMPANY                     = 'sf_companies'
-
-
-class DBAbstract:
-    def get_key_value_format(self):
-        """
-        Returns those attributes' list, values and str_format for which value is not none and attribute's name does not
-        start with '_'. '_' indicates that the attribute is not a table's column.
-        :return: str, list, str
-        """
-        str_keys = ''
-        values = list()
-        str_format = ''
-        for attr, value in self.__dict__.items():
-            if value is not None and not attr.startswith('_'):
-                if str_keys:
-                    str_keys += ', '
-                    str_format += ', '
-
-                str_keys += attr
-                values.append(value)
-                str_format += '%s'
-
-        return str_keys, values, str_format
+from src.dbconn.dbabstract import DBAbstract
 
 class Company(DBAbstract):
     def __init__(self,
@@ -54,3 +30,20 @@ class Company(DBAbstract):
 
         # private attributes not POJO
         self._sf_company_id = None
+
+
+
+class CompanyConfig:
+    COMPANY_ID          = 'sf_company_id'
+    ACT_SYMBOL          = 'sf_act_symbol'
+    COMPANY_NAME        = 'sf_company_name'
+    SECURITY_NAME       = 'sf_security_name'
+    EXCHANGE            = 'sf_exchange'
+    CQS_SYMBOL          = 'sf_cqs_symbol'
+    ETF                 = 'sf_etf'
+    ROUND_LOT_SIZE      = 'sf_round_lot_size'
+    TEST_ISSUE          = 'sf_test_issue'
+    NASDAQ_SYMBOL       = 'sf_nasdaq_symbol'
+    LAST_SCREENED       = 'sf_last_screened'
+    AAOIFI_COMPLIANT    = 'sf_aaoifi_compliant'
+    NC_REASON           = 'sf_nc_reason'
