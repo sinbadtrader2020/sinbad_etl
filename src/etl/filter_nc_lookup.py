@@ -3,6 +3,7 @@ import os
 from csvvalidator import *
 import sys
 from src.etl import common
+from src.etl.config import CompliantConfig
 
 
 # def static_vars(**kwargs):
@@ -93,6 +94,7 @@ class FilterLookupCategory:
 
         for nc_company in self.lookup:
             if company.sf_act_symbol == nc_company['Ticker']:
-                return False, common.get_nc_reason_string(common.NonCompliantReasonCode.NCL)
+                return CompliantConfig.NONCOMPLIANT, \
+                       common.get_nc_reason_string(common.NonCompliantReasonCode.NCL)
 
-        return True, common.CMP_CODE
+        return CompliantConfig.COMPLIANT, common.CMP_CODE

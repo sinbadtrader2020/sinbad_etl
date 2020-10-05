@@ -1,6 +1,7 @@
 import requests
 
 from src.etl import common
+from src.etl.config import CompliantConfig
 
 
 class FilterDR:
@@ -25,7 +26,7 @@ class FilterDR:
 
             data = result.json()
             if not data:
-                return False, \
+                return CompliantConfig.NONCOMPLIANT, \
                        common.get_nc_reason_string(common.NonCompliantReasonCode.DR,
                                                    "No Data ({0})".format(url))
 
@@ -35,20 +36,20 @@ class FilterDR:
             company._iatr_MarketCapitalization = market_capitalization  # will be used in FilterNIR
 
             if market_capitalization <= 0:
-                return False, \
+                return CompliantConfig.NONCOMPLIANT, \
                        common.get_nc_reason_string(common.NonCompliantReasonCode.DR,
                                                    "Zero or Negetive 'MarketCapitalization' ({0})".format(url))
 
             # Business Logic: DR: interest bearing debt to total asset ratio
             ratio = total_longterm_debt / market_capitalization
             if ratio >= 0.3:
-                return False, \
+                return CompliantConfig.NONCOMPLIANT, \
                        common.get_nc_reason_string(common.NonCompliantReasonCode.DR,
                                                    "According to Business Logic ({0})".format(url))
 
         except KeyError as key_error:
-            return False, \
+            return CompliantConfig.NONCOMPLIANT, \
                    common.get_nc_reason_string(common.NonCompliantReasonCode.DR,
                                                "Not found parameter {0} ({1})".format(key_error, url))
 
-        return True, common.CMP_CODE
+        return CompliantConfig.COMPLIANT, common.CMP_CODE

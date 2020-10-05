@@ -1,4 +1,14 @@
 -----------------------------
+----------- VIEW -----------
+-----------------------------
+
+CREATE TYPE SF_COMPLIANT AS ENUM (
+    'COMPLIANT',
+    'NON-COMPLIANT',
+    'YELLOW'
+);
+
+-----------------------------
 ----------- TABLE -----------
 -----------------------------
 
@@ -17,12 +27,11 @@ CREATE TABLE public.sf_companies (
   sf_round_lot_size     DECIMAL,
   sf_test_issue         TEXT,
   sf_nasdaq_symbol      TEXT,
-  sf_aaoifi_compliant   BOOLEAN NOT NULL DEFAULT FALSE,
+  sf_aaoifi_compliant   SF_COMPLIANT NOT NULL DEFAULT 'YELLOW',
   sf_nc_reason          TEXT,
   sf_last_screened      TIMESTAMP DEFAULT NOW(),
   sf_created            TIMESTAMP DEFAULT NOW(),
   sf_updated            TIMESTAMP DEFAULT NOW()
-
 );
 
 ALTER TABLE public.sf_companies OWNER TO sinbad;

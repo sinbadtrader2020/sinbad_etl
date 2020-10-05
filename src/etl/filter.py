@@ -2,7 +2,7 @@ from src.remote.companies_datahub import CompanyDatahub
 from src.dbconn.query import create_or_update_record, get_records_partly
 from src.dbconn.dbclassname import DBClassName
 from src.dbconn.dbclass.company import Company, CompanyConfig
-from src.etl.config import FunctionConfig
+from src.etl.config import FunctionConfig, CompliantConfig
 from src.etl.filter_nc_lookup import FilterLookupCategory
 from src.etl.filter_nis import FilterNIS
 from src.etl.filter_iatr import FilterIATR
@@ -46,7 +46,7 @@ class TradingProcessor:
             compliant, nc_reason = None, None
             for filter in self.filters:
                 compliant, nc_reason = filter(company)
-                if not compliant:
+                if compliant != CompliantConfig.COMPLIANT:
                     print('[INFO] ' + nc_reason)
                     break
 

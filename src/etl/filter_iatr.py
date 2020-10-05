@@ -2,6 +2,7 @@ from datetime import datetime
 import requests
 
 from src.etl import common
+from src.etl.config import CompliantConfig
 
 
 class FilterIATR:
@@ -25,7 +26,7 @@ class FilterIATR:
 
             data = result.json()
             if not data:
-                return False, \
+                return CompliantConfig.NONCOMPLIANT, \
                        common.get_nc_reason_string(common.NonCompliantReasonCode.IATR,
                                                    "No Data ({0})".format(url))
 
@@ -44,7 +45,7 @@ class FilterIATR:
                     date_latest = date
 
             if financial_report_latest is None:
-                return False, \
+                return CompliantConfig.NONCOMPLIANT, \
                        common.get_nc_reason_string(common.NonCompliantReasonCode.IATR,
                                                    "Empty Annual or Querterly Reports ({0})".format(url))
 
@@ -60,19 +61,19 @@ class FilterIATR:
             company._iatr_shortTermInvestments = shortTermInvestments  # will be used in FilterNIR
 
             if totalAssets <= 0:
-                return False, \
+                return CompliantConfig.NONCOMPLIANT, \
                        common.get_nc_reason_string(common.NonCompliantReasonCode.IATR,
                                                    "Zero or Negetive 'totalAssets' ({0})".format(url))
 
             # Business Logic: Illiquid asset to total asset ratio (IATR)
             ratio = (netReceivables + inventory + longTermInvestments + shortTermInvestments) / totalAssets
             if ratio <= 0.3:
-                return False, \
+                return CompliantConfig.NONCOMPLIANT, \
                        common.get_nc_reason_string(common.NonCompliantReasonCode.IATR,
                                                    "According to Business Logic ({0})".format(url))
 
         except KeyError as key_error:
-            return False, \
+            return CompliantConfig.NONCOMPLIANT, \
                    common.get_nc_reason_string(common.NonCompliantReasonCode.IATR,
                                                "Not found parameter {0} ({1})".format(key_error, url))
         except ValueError as value_error:
@@ -85,4 +86,4 @@ class FilterIATR:
                   url)
             # TODO handle exception
 
-        return True, common.CMP_CODE
+        return CompliantConfig.COMPLIANT, common.CMP_CODE

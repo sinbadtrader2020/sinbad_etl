@@ -1,4 +1,5 @@
 from src.etl import common
+from src.etl.config import CompliantConfig
 
 
 class FilterNIR:
@@ -16,7 +17,7 @@ class FilterNIR:
         # Business Logic: NIR: Non-compliant investment to total asset ratio.
         ratio = (longterm_investments + shortterm_investments) / market_capitalization
         if ratio >= 0.33:
-            return False, \
+            return CompliantConfig.NONCOMPLIANT, \
                    common.get_nc_reason_string(common.NonCompliantReasonCode.NIR, "According to Business Logic")
 
-        return True, common.CMP_CODE
+        return CompliantConfig.COMPLIANT, common.CMP_CODE

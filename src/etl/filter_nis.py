@@ -2,6 +2,7 @@ from datetime import datetime
 import requests
 
 from src.etl import common
+from src.etl.config import CompliantConfig
 
 
 class FilterNIS:
@@ -25,7 +26,7 @@ class FilterNIS:
 
             data = result.json()
             if not data:
-                return False, \
+                return CompliantConfig.NONCOMPLIANT, \
                        common.get_nc_reason_string(common.NonCompliantReasonCode.NIS,
                                                    "No Data ({0})".format(url))
 
@@ -43,7 +44,7 @@ class FilterNIS:
                     date_latest = date
 
             if financial_report_latest is None:
-                return False, \
+                return CompliantConfig.NONCOMPLIANT, \
                        common.get_nc_reason_string(common.NonCompliantReasonCode.NIS,
                                                    "Empty Annual or Querterly Reports ({0})".format(url))
 
@@ -51,19 +52,19 @@ class FilterNIS:
             net_income = common.get_string_to_float(financial_report_latest["netIncome"])
 
             if net_income <= 0:
-                return False, \
+                return CompliantConfig.NONCOMPLIANT, \
                        common.get_nc_reason_string(common.NonCompliantReasonCode.NIS,
                                                    "Zero or Negetive 'netIncome' ({0})".format(url))
 
             # Business Logic: Non-compliant Income Source (NIS)
             ratio = interest_income / net_income
             if ratio >= 0.05:
-                return False, \
+                return CompliantConfig.NONCOMPLIANT, \
                        common.get_nc_reason_string(common.NonCompliantReasonCode.NIS,
                                                    "According to Business Logic ({0})".format(url))
 
         except KeyError as key_error:
-            return False, \
+            return CompliantConfig.NONCOMPLIANT, \
                    common.get_nc_reason_string(common.NonCompliantReasonCode.NIS,
                                                "Not found parameter {0} ({1})".format(key_error, url))
         except ValueError as value_error:
@@ -75,4 +76,4 @@ class FilterNIS:
             print("[ERROR][ZeroDivisionError]", self.__class__.__name__, company.sf_act_symbol, zero_division_error, url)
             # TODO handle exception
 
-        return True, common.CMP_CODE
+        return CompliantConfig.COMPLIANT, common.CMP_CODE
