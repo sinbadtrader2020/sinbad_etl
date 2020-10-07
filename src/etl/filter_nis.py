@@ -49,7 +49,18 @@ class FilterNIS:
                                                    "Empty Annual or Querterly Reports ({0})".format(url))
 
             interest_income = common.get_string_to_float(financial_report_latest["interestIncome"])
+            net_interest_income = common.get_string_to_float(financial_report_latest["netInterestIncome"])
             net_income = common.get_string_to_float(financial_report_latest["netIncome"])
+
+            if net_income <=0:
+                net_income = 0
+            if net_interest_income <= 0:
+                net_interest_income = 0
+
+            if net_income == 0 and net_interest_income == 0:
+                return CompliantConfig.YELLOW, \
+                       common.get_nc_reason_string(common.NonCompliantReasonCode.NIS,
+                                                   "Data not adequate to decide on this symbol ({0})".format(url))
 
             if net_income <= 0:
                 return CompliantConfig.NONCOMPLIANT, \
@@ -57,7 +68,7 @@ class FilterNIS:
                                                    "Zero or Negetive 'netIncome' ({0})".format(url))
 
             # Business Logic: Non-compliant Income Source (NIS)
-            ratio = interest_income / net_income
+            ratio = net_interest_income / net_income
             if ratio >= 0.05:
                 return CompliantConfig.NONCOMPLIANT, \
                        common.get_nc_reason_string(common.NonCompliantReasonCode.NIS,

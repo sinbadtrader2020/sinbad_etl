@@ -32,13 +32,15 @@ class FilterDR:
 
             total_longterm_debt = common.get_string_to_float(company._iatr_totalLongTermDebt)
             market_capitalization = common.get_string_to_float(data["MarketCapitalization"])
+            if market_capitalization <= 0:
+                market_capitalization = 0
 
             company._iatr_MarketCapitalization = market_capitalization  # will be used in FilterNIR
 
-            if market_capitalization <= 0:
-                return CompliantConfig.NONCOMPLIANT, \
+            if market_capitalization == 0:
+                return CompliantConfig.YELLOW, \
                        common.get_nc_reason_string(common.NonCompliantReasonCode.DR,
-                                                   "Zero or Negetive 'MarketCapitalization' ({0})".format(url))
+                                                   "Data not adequate to decide on this symbol ({0})".format(url))
 
             # Business Logic: DR: interest bearing debt to total asset ratio
             ratio = total_longterm_debt / market_capitalization

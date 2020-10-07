@@ -50,6 +50,13 @@ class FilterIATR:
                                                    "Empty Annual or Querterly Reports ({0})".format(url))
 
             totalAssets = common.get_string_to_float(financial_report_latest["totalAssets"])
+
+            if financial_report_latest["cash"] == None:
+                return CompliantConfig.YELLOW, \
+                       common.get_nc_reason_string(common.NonCompliantReasonCode.IATR,
+                                                   "Data not adequate to decide on this symbol ({0})".format(url))
+
+            cash = common.get_string_to_float(financial_report_latest["cash"])
             longTermInvestments = common.get_string_to_float(financial_report_latest["longTermInvestments"])
             shortTermInvestments = common.get_string_to_float(financial_report_latest["shortTermInvestments"])
             netReceivables = common.get_string_to_float(financial_report_latest["netReceivables"])
@@ -64,6 +71,16 @@ class FilterIATR:
                 return CompliantConfig.NONCOMPLIANT, \
                        common.get_nc_reason_string(common.NonCompliantReasonCode.IATR,
                                                    "Zero or Negetive 'totalAssets' ({0})".format(url))
+
+            liquid_asset = cash + longTermInvestments + shortTermInvestments + netReceivables + inventory
+            illiquid_asset = totalAssets - liquid_asset
+
+            if illiquid_asset == 0:
+                return CompliantConfig.YELLOW, \
+                       common.get_nc_reason_string(common.NonCompliantReasonCode.IATR,
+                                                   "Data not adequate to decide on this symbol ({0})".format(url))
+
+            ratio = illiquid_asset / totalAssets
 
             # Business Logic: Illiquid asset to total asset ratio (IATR)
             ratio = (netReceivables + inventory + longTermInvestments + shortTermInvestments) / totalAssets
