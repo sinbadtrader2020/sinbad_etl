@@ -48,43 +48,40 @@ class FilterNIS:
                        common.get_nc_reason_string(common.NonCompliantReasonCode.NIS,
                                                    "Empty Annual or Querterly Reports ({0})".format(url))
 
-            interest_income = common.get_string_to_float(financial_report_latest["interestIncome"])
             net_interest_income = common.get_string_to_float(financial_report_latest["netInterestIncome"])
             net_income = common.get_string_to_float(financial_report_latest["netIncome"])
 
-            if net_income <=0:
+            if net_income <= 0:
                 net_income = 0
+
             if net_interest_income <= 0:
                 net_interest_income = 0
 
-            if net_income == 0 and net_interest_income == 0:
-                return CompliantConfig.YELLOW, \
-                       common.get_nc_reason_string(common.NonCompliantReasonCode.NIS,
-                                                   "Data not adequate to decide on this symbol ({0})".format(url))
-
-            if net_income <= 0:
-                return CompliantConfig.NONCOMPLIANT, \
-                       common.get_nc_reason_string(common.NonCompliantReasonCode.NIS,
+            if net_income == 0:
+                if net_interest_income == 0:
+                    return CompliantConfig.YELLOW, \
+                           common.get_nc_reason_string(common.NonCompliantReasonCode.NIS,
+                                                   "Zero or Negetive 'netIncome' and 'netInterestIncome' ({0})".format(url))
+                else:
+                    return CompliantConfig.NONCOMPLIANT, \
+                           common.get_nc_reason_string(common.NonCompliantReasonCode.NIS,
                                                    "Zero or Negetive 'netIncome' ({0})".format(url))
-
-            # Business Logic: Non-compliant Income Source (NIS)
-            ratio = net_interest_income / net_income
-            if ratio >= 0.05:
-                return CompliantConfig.NONCOMPLIANT, \
-                       common.get_nc_reason_string(common.NonCompliantReasonCode.NIS,
-                                                   "According to Business Logic ({0})".format(url))
+            else:
+                # Business Logic: Non-compliant Income Source (NIS)
+                ratio = net_interest_income / net_income
+                if ratio >= 0.05:
+                    return CompliantConfig.NONCOMPLIANT, \
+                           common.get_nc_reason_string(common.NonCompliantReasonCode.NIS,
+                                                       "According to Business Logic ({0})".format(url))
 
         except KeyError as key_error:
-            return CompliantConfig.NONCOMPLIANT, \
+            return CompliantConfig.YELLOW, \
                    common.get_nc_reason_string(common.NonCompliantReasonCode.NIS,
                                                "Not found parameter {0} ({1})".format(key_error, url))
-        except ValueError as value_error:
-            # print(result.status_code, data)
-            print("[ERROR][ValueError]", self.__class__.__name__, company.sf_act_symbol, value_error, url)
-            # TODO handle exception
-        except ZeroDivisionError as zero_division_error:
-            # print(result.status_code, data)
-            print("[ERROR][ZeroDivisionError]", self.__class__.__name__, company.sf_act_symbol, zero_division_error, url)
-            # TODO handle exception
+        except Exception as exception:
+            print("[ERROR][Exception]", self.__class__.__name__, company.sf_act_symbol, exception, url)
+            return CompliantConfig.YELLOW, \
+                   common.get_nc_reason_string(common.NonCompliantReasonCode.NIS,
+                                               "Unknown Exception found: {0} ({1})".format(exception, url))
 
         return CompliantConfig.COMPLIANT, common.CMP_CODE
