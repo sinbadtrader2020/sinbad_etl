@@ -26,7 +26,7 @@ class FilterNIS:
 
             data = result.json()
             if not data:
-                return CompliantConfig.NONCOMPLIANT, \
+                return CompliantConfig.YELLOW, \
                        common.get_nc_reason_string(common.NonCompliantReasonCode.NIS,
                                                    "No Data ({0})".format(url))
 
@@ -44,7 +44,7 @@ class FilterNIS:
                     date_latest = date
 
             if financial_report_latest is None:
-                return CompliantConfig.NONCOMPLIANT, \
+                return CompliantConfig.YELLOW, \
                        common.get_nc_reason_string(common.NonCompliantReasonCode.NIS,
                                                    "Empty Annual or Querterly Reports ({0})".format(url))
 

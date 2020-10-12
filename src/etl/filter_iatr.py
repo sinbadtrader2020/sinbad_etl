@@ -26,7 +26,7 @@ class FilterIATR:
 
             data = result.json()
             if not data:
-                return CompliantConfig.NONCOMPLIANT, \
+                return CompliantConfig.YELLOW, \
                        common.get_nc_reason_string(common.NonCompliantReasonCode.IATR,
                                                    "No Data ({0})".format(url))
 
@@ -45,7 +45,7 @@ class FilterIATR:
                     date_latest = date
 
             if financial_report_latest is None:
-                return CompliantConfig.NONCOMPLIANT, \
+                return CompliantConfig.YELLOW, \
                        common.get_nc_reason_string(common.NonCompliantReasonCode.IATR,
                                                    "Empty Annual or Querterly Reports ({0})".format(url))
 

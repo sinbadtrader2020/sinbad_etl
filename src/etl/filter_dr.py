@@ -26,21 +26,25 @@ class FilterDR:
 
             data = result.json()
             if not data:
-                return CompliantConfig.NONCOMPLIANT, \
+                return CompliantConfig.YELLOW, \
                        common.get_nc_reason_string(common.NonCompliantReasonCode.DR,
                                                    "No Data ({0})".format(url))
 
             total_longterm_debt = common.get_string_to_float(company._iatr_totalLongTermDebt)
-            market_capitalization = common.get_string_to_float(data["MarketCapitalization"])
-            if market_capitalization <= 0:
+            market_capitalization = data["MarketCapitalization"]
+
+            if market_capitalization < 0:
                 market_capitalization = 0
+
+            if total_longterm_debt < 0:
+                total_longterm_debt = -total_longterm_debt
 
             company._iatr_MarketCapitalization = market_capitalization  # will be used in FilterNIR
 
             if market_capitalization == 0:
                 return CompliantConfig.YELLOW, \
                        common.get_nc_reason_string(common.NonCompliantReasonCode.DR,
-                                                   "Data not adequate to decide on this symbol ({0})".format(url))
+                                                   "Zero or Negetive 'MarketCapitalization' ({0})".format(url))
 
             # Business Logic: DR: interest bearing debt to total asset ratio
             ratio = total_longterm_debt / market_capitalization
@@ -50,8 +54,13 @@ class FilterDR:
                                                    "According to Business Logic ({0})".format(url))
 
         except KeyError as key_error:
-            return CompliantConfig.NONCOMPLIANT, \
+            return CompliantConfig.YELLOW, \
                    common.get_nc_reason_string(common.NonCompliantReasonCode.DR,
                                                "Not found parameter {0} ({1})".format(key_error, url))
+        except Exception as exception:
+            print("[ERROR][Exception]", self.__class__.__name__, company.sf_act_symbol, exception, url)
+            return CompliantConfig.YELLOW, \
+                   common.get_nc_reason_string(common.NonCompliantReasonCode.DR,
+                                               "Unknown Exception found: {0} ({1})".format(exception, url))
 
         return CompliantConfig.COMPLIANT, common.CMP_CODE
