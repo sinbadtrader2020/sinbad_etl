@@ -31,7 +31,7 @@ class FilterDR:
                                                    "No Data ({0})".format(url))
 
             total_longterm_debt = common.get_string_to_float(company._iatr_totalLongTermDebt)
-            market_capitalization = data["MarketCapitalization"]
+            market_capitalization = common.get_string_to_float(data["MarketCapitalization"])
 
             if market_capitalization < 0:
                 market_capitalization = 0
@@ -57,10 +57,10 @@ class FilterDR:
             return CompliantConfig.YELLOW, \
                    common.get_nc_reason_string(common.NonCompliantReasonCode.DR,
                                                "Not found parameter {0} ({1})".format(key_error, url))
-        except Exception as exception:
-            print("[ERROR][Exception]", self.__class__.__name__, company.sf_act_symbol, exception, url)
-            return CompliantConfig.YELLOW, \
-                   common.get_nc_reason_string(common.NonCompliantReasonCode.DR,
-                                               "Unknown Exception found: {0} ({1})".format(exception, url))
+        # except Exception as exception:
+        #     print("[ERROR][Exception]", self.__class__.__name__, company.sf_act_symbol, exception, url)
+        #     return CompliantConfig.YELLOW, \
+        #            common.get_nc_reason_string(common.NonCompliantReasonCode.DR,
+        #                                        "Unknown Exception found: {0} ({1})".format(exception, url))
 
         return CompliantConfig.COMPLIANT, common.CMP_CODE
