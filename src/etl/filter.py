@@ -1,4 +1,3 @@
-from src.remote.companies_datahub import CompanyDatahub
 from src.dbconn.query import create_or_update_record, get_records_partly
 from src.dbconn.dbclassname import DBClassName
 from src.dbconn.dbclass.company import Company, CompanyConfig
@@ -12,8 +11,6 @@ from src.sharedobj import SharedObject
 
 class TradingProcessor:
     def __init__(self):
-        self.url_registerred_companies = SharedObject.APP_Config.COMPANIES
-
         self.path_lookup_csv = SharedObject.APP_Config.DIRECTORY
 
         self.url_company_report = SharedObject.APP_Config.REPORT
@@ -28,16 +25,6 @@ class TradingProcessor:
         ]
 
     def load_companies(self):
-        # Load companies from Datahub and insert in DB
-        companies = CompanyDatahub().load_companies(path=self.url_registerred_companies)
-        for row in companies:
-            company = Company(*row)
-
-            # TODO check result & success
-            result, success = create_or_update_record(table_name=DBClassName.COMPANY,
-                                                      conflict_field=CompanyConfig.ACT_SYMBOL,
-                                                      return_field=CompanyConfig.COMPANY_ID,
-                                                      record=company)
 
         iter_row = get_records_partly(table_name=DBClassName.COMPANY)
         for row in iter_row:
