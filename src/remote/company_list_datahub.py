@@ -11,7 +11,7 @@ class CompanyListDatahub (CompanyListInterface):
         super().__init__(config)
 
         self.url_registerred_companies = config.get('DATAHUB', 'COMPANIES').split('\n')
-        print(self.url_registerred_companies)
+        print('\'DATAHUB\' --> ', self.url_registerred_companies)
 
     def load_companies(self) -> iter:
         for path in self.url_registerred_companies:
