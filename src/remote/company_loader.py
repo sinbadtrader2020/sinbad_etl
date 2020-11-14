@@ -1,6 +1,6 @@
 from src.dbconn.dbclass.company import Company, CompanyConfig
 from src.dbconn.dbclassname import DBClassName
-from src.dbconn.query import create_or_update_record
+from src.dbconn.query import create_record
 from src.remote.company_list_datahub import CompanyListDatahub
 from src.remote.company_list_nasdaq import CompanyListNasdaq
 
@@ -24,7 +24,6 @@ class CompanyLoader:
                 company = Company(*row)
 
                 # TODO check result & success
-                result, success = create_or_update_record(table_name=DBClassName.COMPANY,
-                                                          conflict_field=CompanyConfig.ACT_SYMBOL,
-                                                          return_field=CompanyConfig.COMPANY_ID,
-                                                          record=company)
+                result, success = create_record(table_name=DBClassName.COMPANY,
+                                                return_field=CompanyConfig.COMPANY_ID,
+                                                record=company)

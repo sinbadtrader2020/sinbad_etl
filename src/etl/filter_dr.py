@@ -1,4 +1,5 @@
 import requests
+import socket
 
 from src.etl import common
 from src.etl.config import CompliantConfig
@@ -57,6 +58,11 @@ class FilterDR:
             return CompliantConfig.YELLOW, \
                    common.get_nc_reason_string(common.NonCompliantReasonCode.DR,
                                                "Not found parameter {0} ({1})".format(key_error, url))
+
+        except (TimeoutError, socket.gaierror, ConnectionError, OSError) as  newtork_error:
+            return CompliantConfig.NETWORK_ERR, \
+                   common.get_nc_reason_string(common.NonCompliantReasonCode.DR,
+                                               "Network problem {0} ({1})".format(newtork_error, url))
         # except Exception as exception:
         #     print("[ERROR][Exception]", self.__class__.__name__, company.sf_act_symbol, exception, url)
         #     return CompliantConfig.YELLOW, \

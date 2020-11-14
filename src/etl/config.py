@@ -7,4 +7,5 @@ class FunctionConfig:
 class CompliantConfig:
     COMPLIANT           = 'COMPLIANT',
     NONCOMPLIANT        = 'NON-COMPLIANT',
-    YELLOW              = 'YELLOW'
+    YELLOW              = 'YELLOW',
+    NETWORK_ERR         = 'NETWORK_ERR'
