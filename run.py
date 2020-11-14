@@ -6,7 +6,6 @@ from config import Config
 
 from src.etl.filter import TradingProcessor
 from src.remote.company_loader import CompanyLoader
-from src.sharedobj import SharedObject
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -22,23 +21,8 @@ if __name__ == '__main__':
     config = configparser.ConfigParser()
     config.read(args.config_path)
 
-    # [API]
-    # COMPANIES = 'https://pkgstore.datahub.io/core/nyse-other-listings/7/datapackage.json'
-    # REPORT = 'https://www.alphavantage.co/query'
-    # KEY = 'AOYGBU6J7IN09PCE'
-    #
-    # [LOOKUP]
-    # DIRECTORY = '/home/maruf/Documents/tirzokcodebase/sinbad_finance_etl/file/lookup/'
-
-    Config.REPORT = config.get('API', 'REPORT', fallback='https://www.alphavantage.co/query')
-    Config.KEY = config.get('API', 'KEY', fallback='AOYGBU6J7IN09PCE')
-    Config.DIRECTORY = config.get('LOOKUP', 'DIRECTORY',
-                                    fallback='/home/maruf/Documents/tirzokcodebase/sinbad_finance_etl/file/lookup/')
-
-    SharedObject.APP_Config = Config
-
     company_loader = CompanyLoader(config)
     company_loader.load_companies()
 
-    processor = TradingProcessor()
+    processor = TradingProcessor(config)
     processor.load_companies()

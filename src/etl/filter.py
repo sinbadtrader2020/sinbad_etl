@@ -7,14 +7,12 @@ from src.etl.filter_nis import FilterNIS
 from src.etl.filter_iatr import FilterIATR
 from src.etl.filter_dr import FilterDR
 from src.etl.filter_nir import FilterNIR
-from src.sharedobj import SharedObject
 
 class TradingProcessor:
-    def __init__(self):
-        self.path_lookup_csv = SharedObject.APP_Config.DIRECTORY
-
-        self.url_company_report = SharedObject.APP_Config.REPORT
-        self.apikey = SharedObject.APP_Config.KEY  # 'JFG78N1VW11CJSOW'
+    def __init__(self, config):
+        self.path_lookup_csv = config.get('LOOKUP', 'DIRECTORY')
+        self.url_company_report = config.get('API', 'REPORT')
+        self.apikey = config.get('API', 'KEY')  # 'AOYGBU6J7IN09PCE'
 
         self.filters = [
             FilterLookupCategory(self.path_lookup_csv),
