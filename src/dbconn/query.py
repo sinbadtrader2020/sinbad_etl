@@ -9,7 +9,8 @@ def _execute_select_all(sql, data=None):
     success = False
     try:
         with connection.get_db_cursor() as cursor:
-            # print("[INFO: _execute_select]", cursor.mogrify(sql, data))
+            print("[INFO: _execute_select]", cursor.mogrify(sql, data))
+
             if data:
                 cursor.execute(sql, data)
             else:
@@ -18,7 +19,8 @@ def _execute_select_all(sql, data=None):
             result = {DATA: rows}
             success = True
     except Exception as e:
-        print(e)
+        print("[ERROR: _execute_select]", e)
+
         result = {ERROR: str(e)}
 
     return result, success
@@ -35,6 +37,8 @@ def _iter_row(cursor, size=10):
 
 def _execute_select_many(sql, data=None, limit=10):
     with connection.get_db_cursor() as cursor:
+        print("[INFO: _execute_select_many]", cursor.mogrify(sql, data))
+
         if data:
             cursor.execute(sql, data)
         else:
@@ -48,13 +52,15 @@ def _execute_iud(sql, data, commit=False):
     result = ''
     try:
         with connection.get_db_cursor(commit) as cursor:
-            # print("[INFO: _execute_iud]", cursor.mogrify(sql, data))
+            print("[INFO: _execute_iud]", cursor.mogrify(sql, data))
+
             cursor.execute(sql, data)
             rows = cursor.fetchall()
             result = {DATA: rows}
             success = True
     except Exception as e:
         print("[ERROR: _execute_iud]",e)
+
         # print(e.__dict__)
         # print(e.pgcode)
         # print(errorcodes.lookup(e.pgcode[:2]))
@@ -101,7 +107,6 @@ def get_records(table_name=None, group=False, offset=0, limit='ALL', field_name=
         sql = """SELECT * from {0} WHERE {1} = %s""".format(table_name, field_name)
         data = (offset,)
 
-    print(sql)
     return _execute_select_all(sql, data)
 
 
@@ -122,7 +127,6 @@ def get_records_partly(table_name=None, group=False, offset=0, limit=10, field_n
     else:
         sql = """SELECT * from {0}""".format(table_name)
 
-    print(sql)
     return _execute_select_many(sql, data, limit)
 
 
@@ -132,11 +136,10 @@ def get_count(table_name=None):
     return _execute_select_all(sql)
 
 
-def create_record(table_name=None, record=None, field_name=None, production=True):
+def create_record(table_name=None, record=None, return_field=None, production=True):
     str_keys, values, str_format = record.get_key_value_format()
     sql = """INSERT INTO {0} ({1}) VALUES ({2}) RETURNING {3}""" \
-        .format(table_name, str_keys, str_format, field_name)
-    print(sql)
+        .format(table_name, str_keys, str_format, return_field)
 
     return _execute_iud(sql, values, commit=production)
 
@@ -150,6 +153,7 @@ def update_record(table_name=None, record=None, field_name=None, field_value=Non
         sql = """UPDATE {0} SET {1} = {2} WHERE {3} = %s RETURNING {4}""" \
             .format(table_name, str_keys, str_format, field_name, field_name)
     values.append(field_value)
+
     return _execute_iud(sql, values, commit=production)
 
 
