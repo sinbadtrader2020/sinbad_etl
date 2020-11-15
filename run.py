@@ -2,8 +2,8 @@
 import argparse
 from pathlib import Path
 import configparser
-from config import Config
 
+from src.dbconn import connection
 from src.etl.filter import TradingProcessor
 from src.remote.company_loader import CompanyLoader
 
@@ -20,6 +20,8 @@ if __name__ == '__main__':
 
     config = configparser.ConfigParser()
     config.read(args.config_path)
+
+    connection.config_database(config)
 
     company_loader = CompanyLoader(config)
     company_loader.load_companies()

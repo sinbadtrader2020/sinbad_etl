@@ -4,19 +4,32 @@ from contextlib import contextmanager
 
 
 class Connection:
-    def __init__(self,
-                 db_name=None,
-                 db_username=None,
-                 db_password=None,
-                 db_hostname=None,
-                 db_port=None):
-        self.db_name = db_name
-        self.db_username = db_username
-        self.db_password = db_password
-        self.db_hostname = db_hostname
-        self.db_port = db_port
-
+    def __init__(self):
         self.pool = None
+
+        self.db_name = None
+        self.db_username = None
+        self.db_password = None
+        self.db_hostname = None
+        self.db_port = None
+
+    def config_database(self, config):
+        section_name = "DATABASE"
+
+        self.db_name = config.get(section_name, 'DB_NAME')
+        self.db_username = config.get(section_name, 'DB_USERNAME')
+        self.db_password = config.get(section_name, 'DB_PASSWORD')
+        self.db_hostname = config.get(section_name, 'DB_HOSTNAME')
+        self.db_port = config.get(section_name, 'DB_PORT')
+
+        print('\'DATABASE\' --> ',
+              '\n\t' + self.db_name,
+              '\n\t' + self.db_username,
+              '\n\t' + "<hidden>",
+              '\n\t' + self.db_hostname,
+              '\n\t' + self.db_port)
+
+        self.pool = None    # Reinitialize
 
     @contextmanager
     def get_db_connection(self):
@@ -48,11 +61,4 @@ class Connection:
                 cursor.close()
 
 
-db_config = {
-    'db_name': 'sinbad',
-    'db_username': 'sinbad',
-    'db_password': 'sinbad@finance',
-    'db_hostname': 'localhost',
-    'db_port': 5432
-}
-connection = Connection(**db_config)
+connection = Connection()
