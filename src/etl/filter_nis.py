@@ -1,9 +1,11 @@
 from datetime import datetime
 import requests
 import socket
+import inspect
 
 from src.etl import common
 from src.etl.config import CompliantConfig
+from src.utils import logger
 
 
 class FilterNIS:
@@ -34,7 +36,8 @@ class FilterNIS:
             financial_reports = data.get("quarterlyReports", None)
             if financial_reports is None:
                 financial_reports = data["annualReports"]
-                print("[CAUSE]", self.__class__.__name__, company.sf_act_symbol, url, "No 'quarterlyReports', used 'annualReports'")
+                logger.info("CAUSE --> " + self.__class__.__name__ + ", " +
+                            company.sf_act_symbol + ", " + url + ", No 'quarterlyReports', used 'annualReports'")
 
             financial_report_latest = None
             date_latest = datetime.strptime("1970-01-01", '%Y-%m-%d')

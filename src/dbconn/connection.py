@@ -1,6 +1,7 @@
 from psycopg2.pool import ThreadedConnectionPool
 from psycopg2.extras import RealDictCursor
 from contextlib import contextmanager
+from src.utils import logger
 
 
 class Connection:
@@ -22,12 +23,12 @@ class Connection:
         self.db_hostname = config.get(section_name, 'DB_HOSTNAME')
         self.db_port = config.get(section_name, 'DB_PORT')
 
-        print('\'DATABASE\' --> ',
-              '\n\t' + self.db_name,
-              '\n\t' + self.db_username,
-              '\n\t' + "<hidden>",
-              '\n\t' + self.db_hostname,
-              '\n\t' + self.db_port)
+        logger.info('DATABASE --> ' +
+                    '\n\t' + self.db_name +
+                    '\n\t' + self.db_username +
+                    '\n\t' + "<hidden>" +
+                    '\n\t' + self.db_hostname +
+                    '\n\t' + self.db_port)
 
         self.pool = None    # Reinitialize
 

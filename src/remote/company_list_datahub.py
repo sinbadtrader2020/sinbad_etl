@@ -2,6 +2,7 @@ from configparser import ConfigParser
 
 from datapackage import Package
 from src.remote.company_list_interface import CompanyListInterface
+from src.utils import logger
 
 
 class CompanyListDatahub (CompanyListInterface):
@@ -11,7 +12,8 @@ class CompanyListDatahub (CompanyListInterface):
         super().__init__(config)
 
         self.url_registerred_companies = config.get('DATAHUB', 'COMPANIES').split('\n')
-        print('\'DATAHUB\' --> ', self.url_registerred_companies)
+
+        logger.info('DATAHUB --> ' + str(self.url_registerred_companies))
 
     def load_companies(self) -> iter:
         for path in self.url_registerred_companies:

@@ -1,4 +1,5 @@
 from datetime import datetime
+import inspect
 import time
 
 from src.dbconn.query import update_record, get_records_partly
@@ -10,6 +11,7 @@ from src.etl.filter_nis import FilterNIS
 from src.etl.filter_iatr import FilterIATR
 from src.etl.filter_dr import FilterDR
 from src.etl.filter_nir import FilterNIR
+from src.utils import logger
 
 class TradingProcessor:
     def __init__(self, config):
@@ -38,8 +40,8 @@ class TradingProcessor:
             timestamp = datetime.timestamp(company.sf_last_screened)
             time_difference = time.time() - timestamp
             if time_difference < self.update_frequency:
-                print("[INFO: filter-load_companies]",
-                      "Yet to cross update frequency ({0} - {1})".format(company.sf_act_symbol, company.sf_company_name))
+                logger.info("filter-" + inspect.stack()[0][3] +
+                            "--> Yet to cross update frequency ({0} - {1})".format(company.sf_act_symbol, company.sf_company_name))
                 continue
 
 
@@ -47,7 +49,7 @@ class TradingProcessor:
             for filter in self.filters:
                 compliant, nc_reason = filter(company)
                 if compliant != CompliantConfig.COMPLIANT:
-                    print('[INFO] ' + nc_reason)
+                    logger.info("filter-" + inspect.stack()[0][3] + " --> " + nc_reason)
                     break
 
             if self.max_check > 0:

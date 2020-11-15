@@ -57,7 +57,7 @@ class CompanyListNasdaq(CompanyListInterface):
         )
 
         companies = load_csv_data_from_directory(directory_name=self.directory_path, csv_header=field_names)
-        print(companies)
+        # print(companies)
         return companies
 
     def read_companies(self) -> []:

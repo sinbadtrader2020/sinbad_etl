@@ -1,4 +1,6 @@
 from src.dbconn import connection
+from src.utils import logger
+import inspect
 
 DATA = 'data'
 ERROR = 'error'
@@ -9,7 +11,7 @@ def _execute_select_all(sql, data=None):
     success = False
     try:
         with connection.get_db_cursor() as cursor:
-            print("[INFO: _execute_select]", cursor.mogrify(sql, data))
+            logger.info(inspect.stack()[0][3] + " --> " + cursor.mogrify(sql, data).decode("utf-8") )
 
             if data:
                 cursor.execute(sql, data)
@@ -19,7 +21,7 @@ def _execute_select_all(sql, data=None):
             result = {DATA: rows}
             success = True
     except Exception as e:
-        print("[ERROR: _execute_select]", e)
+        logger.exception(inspect.stack()[0][3], exc_info=True)
 
         result = {ERROR: str(e)}
 
@@ -37,7 +39,7 @@ def _iter_row(cursor, size=10):
 
 def _execute_select_many(sql, data=None, limit=10):
     with connection.get_db_cursor() as cursor:
-        print("[INFO: _execute_select_many]", cursor.mogrify(sql, data))
+        logger.info(inspect.stack()[0][3] + " --> " + cursor.mogrify(sql, data).decode("utf-8") )
 
         if data:
             cursor.execute(sql, data)
@@ -52,14 +54,14 @@ def _execute_iud(sql, data, commit=False):
     result = ''
     try:
         with connection.get_db_cursor(commit) as cursor:
-            print("[INFO: _execute_iud]", cursor.mogrify(sql, data))
+            logger.info(inspect.stack()[0][3] + " --> " + cursor.mogrify(sql, data).decode("utf-8") )
 
             cursor.execute(sql, data)
             rows = cursor.fetchall()
             result = {DATA: rows}
             success = True
     except Exception as e:
-        print("[ERROR: _execute_iud]",e)
+        logger.exception(inspect.stack()[0][3], exc_info=True)
 
         # print(e.__dict__)
         # print(e.pgcode)

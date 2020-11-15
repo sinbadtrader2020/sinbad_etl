@@ -6,6 +6,7 @@ import configparser
 from src.dbconn import connection
 from src.etl.filter import TradingProcessor
 from src.remote.company_loader import CompanyLoader
+from src.utils import logger
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -20,6 +21,8 @@ if __name__ == '__main__':
 
     config = configparser.ConfigParser()
     config.read(args.config_path)
+
+    logger.config_logger(config)
 
     connection.config_database(config)
 
