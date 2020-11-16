@@ -13,7 +13,8 @@ class CompanyListDatahub (CompanyListInterface):
 
         self.url_registerred_companies = config.get('DATAHUB', 'COMPANIES').split('\n')
 
-        logger.info('DATAHUB --> ' + str(self.url_registerred_companies))
+        logger.info('DATAHUB --> ' +
+                    '\n\tCOMPANIES: ' + str(self.url_registerred_companies))
 
     def load_companies(self) -> iter:
         for path in self.url_registerred_companies:

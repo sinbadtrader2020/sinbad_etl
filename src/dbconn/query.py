@@ -7,11 +7,13 @@ ERROR = 'error'
 MESSAGE = 'message'
 
 
-def _execute_select_all(sql, data=None):
+def _execute_select_all(sql, data=None) -> (dict, bool):
     success = False
+    sql_string = None
     try:
         with connection.get_db_cursor() as cursor:
-            logger.info(inspect.stack()[0][3] + " --> " + cursor.mogrify(sql, data).decode("utf-8") )
+            sql_string = cursor.mogrify(sql, data).decode("utf-8")
+            logger.debug(inspect.stack()[0][3] + " --> " + sql_string)
 
             if data:
                 cursor.execute(sql, data)
@@ -20,10 +22,12 @@ def _execute_select_all(sql, data=None):
             rows = cursor.fetchall()
             result = {DATA: rows}
             success = True
-    except Exception as e:
-        logger.exception(inspect.stack()[0][3], exc_info=True)
 
-        result = {ERROR: str(e)}
+    except Exception as e:
+        err_msg = inspect.stack()[0][3] + " --> \n" + sql_string + "\n" + str(e)
+        logger.error(err_msg)
+
+        result = {ERROR: err_msg}
 
     return result, success
 
@@ -38,60 +42,53 @@ def _iter_row(cursor, size=10):
 
 
 def _execute_select_many(sql, data=None, limit=10):
-    with connection.get_db_cursor() as cursor:
-        logger.info(inspect.stack()[0][3] + " --> " + cursor.mogrify(sql, data).decode("utf-8") )
+    sql_string = None
+    try:
+        with connection.get_db_cursor() as cursor:
+            sql_string = cursor.mogrify(sql, data).decode("utf-8")
+            logger.debug(inspect.stack()[0][3] + " --> " + sql_string)
 
-        if data:
-            cursor.execute(sql, data)
-        else:
-            cursor.execute(sql)
+            if data:
+                cursor.execute(sql, data)
+            else:
+                cursor.execute(sql)
 
-        yield from _iter_row(cursor, limit)
+            yield from _iter_row(cursor, limit)
+
+    except Exception as e:
+        err_msg = inspect.stack()[0][3] + " --> \n" + sql_string + "\n" + str(e)
+        logger.error(err_msg)
+
+        result = {ERROR: err_msg}
+
+        return result, False
 
 
-def _execute_iud(sql, data, commit=False):
+def _execute_iud(sql, data, commit=False, **kwargs) -> (dict, bool):
     success = False
     result = ''
+    sql_string = None
     try:
         with connection.get_db_cursor(commit) as cursor:
-            logger.info(inspect.stack()[0][3] + " --> " + cursor.mogrify(sql, data).decode("utf-8") )
+            sql_string = cursor.mogrify(sql, data).decode("utf-8")
+            logger.info(inspect.stack()[0][3] + " --> " + sql_string)
 
             cursor.execute(sql, data)
             rows = cursor.fetchall()
             result = {DATA: rows}
             success = True
-    except Exception as e:
-        logger.exception(inspect.stack()[0][3], exc_info=True)
 
-        # print(e.__dict__)
-        # print(e.pgcode)
-        # print(errorcodes.lookup(e.pgcode[:2]))
-        # print(errorcodes.lookup(e.pgcode))
-        result = {ERROR: e}
+    except Exception as e:
+        err_msg = inspect.stack()[0][3] + " --> \n" + sql_string + "\n" + str(e)
+
+        # To ignore some exception
+        ignore = kwargs.get('ignore_exception')
+        if not ignore or not (ignore in err_msg):
+            logger.error(err_msg)
+
+        result = {ERROR: err_msg}
 
     return result, success
-
-
-# def _execute_transection(sqls):
-#     success = False
-#     result = ''
-#     try:
-#         with connection.get_db_cursor(True) as cursor:
-#             for sql in sqls:
-#                 print(cursor.mogrify(sql, data))
-#                 cursor.execute(sql, data)
-#                 rows = cursor.fetchall()
-#                 result = {DATA: rows}
-#             success = True
-#     except Exception as e:
-#         print(e)
-#         # print(e.__dict__)
-#         # print(e.pgcode)
-#         # print(errorcodes.lookup(e.pgcode[:2]))
-#         # print(errorcodes.lookup(e.pgcode))
-#         result = {ERROR: str(e)}
-#
-#     return result, success
 
 
 def get_records(table_name=None, group=False, offset=0, limit='ALL', field_name=None, qparam=False):
@@ -138,12 +135,12 @@ def get_count(table_name=None):
     return _execute_select_all(sql)
 
 
-def create_record(table_name=None, record=None, return_field=None, production=True):
+def create_record(table_name=None, record=None, return_field=None, production=True, **kwargs):
     str_keys, values, str_format = record.get_key_value_format()
     sql = """INSERT INTO {0} ({1}) VALUES ({2}) RETURNING {3}""" \
         .format(table_name, str_keys, str_format, return_field)
 
-    return _execute_iud(sql, values, commit=production)
+    return _execute_iud(sql, values, commit=production, **kwargs)
 
 
 def update_record(table_name=None, record=None, field_name=None, field_value=None, production=True):

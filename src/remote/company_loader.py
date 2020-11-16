@@ -26,4 +26,5 @@ class CompanyLoader:
                 # TODO check result & success
                 result, success = create_record(table_name=DBClassName.COMPANY,
                                                 return_field=CompanyConfig.COMPANY_ID,
-                                                record=company)
+                                                record=company,
+                                                ignore_exception='duplicate key')

@@ -24,11 +24,11 @@ class Connection:
         self.db_port = config.get(section_name, 'DB_PORT')
 
         logger.info('DATABASE --> ' +
-                    '\n\t' + self.db_name +
-                    '\n\t' + self.db_username +
-                    '\n\t' + "<hidden>" +
-                    '\n\t' + self.db_hostname +
-                    '\n\t' + self.db_port)
+                    '\n\tDB_NAME: ' + self.db_name +
+                    '\n\tDB_USERNAME: ' + self.db_username +
+                    '\n\tDB_PASSWORD: ' + "<hidden>" +
+                    '\n\tDB_HOSTNAME: ' + self.db_hostname +
+                    '\n\tDB_PORT: ' + self.db_port)
 
         self.pool = None    # Reinitialize
 

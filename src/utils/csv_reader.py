@@ -64,7 +64,4 @@ def load_csv_data_from_directory(directory_name=None, csv_header=None):
             tmp = load_csv_data_from_file(directory_name + entry.name, csv_header)
             dict_list.extend(tmp)
 
-    # import pprint
-    # pprint.pprint(dict_list)
-
     return dict_list

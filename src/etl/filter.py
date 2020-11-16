@@ -29,6 +29,13 @@ class TradingProcessor:
             FilterNIR(),
         ]
 
+        logger.info('FILTER --> ' +
+                    '\n\tDIRECTORY: ' + self.path_lookup_csv +
+                    '\n\tREPORT: ' + self.url_company_report +
+                    '\n\tKEY: ' + "<hidden>" +
+                    '\n\tMAX_CHECK: ' + str(self.max_check) +
+                    '\n\tUPDATE_FREQUENCY: ' + str(self.update_frequency))
+
     def load_companies(self):
 
         iter_row = get_records_partly(table_name=DBClassName.COMPANY)

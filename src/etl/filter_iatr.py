@@ -88,11 +88,4 @@ class FilterIATR:
                    common.get_nc_reason_string(common.NonCompliantReasonCode.IATR,
                                                "Network problem {0} ({1})".format(newtork_error, url))
 
-
-        # except Exception as exception:
-        #     print("[ERROR][Exception]", self.__class__.__name__, company.sf_act_symbol, exception, url)
-        #     return CompliantConfig.YELLOW, \
-        #            common.get_nc_reason_string(common.NonCompliantReasonCode.IATR,
-        #                                        "Unknown Exception found: {0} ({1})".format(exception, url))
-
         return CompliantConfig.COMPLIANT, common.CMP_CODE
